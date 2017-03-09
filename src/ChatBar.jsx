@@ -36,7 +36,7 @@ class ChatBar extends Component {
       content: this.state.message,
       notification: notification
     })
-    this.setState({message: ''})
+    this.setState({newUser: '', message: ''})
   }
   render() {
     console.log("Rendering <ChatBar/>");
@@ -54,7 +54,7 @@ class ChatBar extends Component {
               placeholder="Type a message and hit ENTER"
               value={this.state.message}
               onChange={this.handleChange} />
-            <input type="submit" value="Send" />
+            <input className="send" type="submit" value="Send" />
           </form>
         </footer>
       </div>

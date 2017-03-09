@@ -2,6 +2,7 @@ const express = require('express')
 const SocketServer = require('ws').Server
 const WebSocket = require("ws")
 const uuid = require('uuid/v4')
+const randomColor = require('random-color')
 // chatty_server------------------------------
 const PORT = 3001;
 
@@ -20,15 +21,18 @@ const userCount = {
   count: 0
 };
 
-function clientConnected(client, clientId) {
-  clients[clientId] = client
+function clientConnected(client, clientId, clientColor) {
+  clients[clientId] = {
+    client: client,
+    clientColor: clientColor
+  }
 };
 
 function broadcast(client, pkge) {
-  for (clt in clients) {
-    console.log("readyState", clients[clt].readyState, "socket status", WebSocket.OPEN);
-    if (clt !== client && clients[clt].readyState === WebSocket.OPEN) {
-      clients[clt].send(JSON.stringify(pkge));
+  for (cltId in clients) {
+    console.log("readyState", clients[cltId].client.readyState, "socket status", WebSocket.OPEN);
+    if (cltId !== client && clients[cltId].client.readyState === WebSocket.OPEN) {
+      clients[cltId].client.send(JSON.stringify(pkge));
     }
   }
 };
@@ -38,7 +42,8 @@ function broadcast(client, pkge) {
 wss.on('connection', (client) => {
   console.log('Client connected');
   const clientId = uuid();
-  clientConnected(client, clientId);
+  const clientColor = randomColor().hexString();
+  clientConnected(client, clientId, clientColor);
 
   userCount.count ++;
   console.log(userCount);
@@ -46,7 +51,8 @@ wss.on('connection', (client) => {
 
   client.on('message', function incoming(message) {
     let mes = JSON.parse(message)
-    console.log("server onmessage", mes);
+    // console.log("clients:", clients);
+    console.log("received:", mes);
     if (mes.type === "postMessage") {
       mes.type = "incomingMessage"
     }
@@ -54,6 +60,8 @@ wss.on('connection', (client) => {
       mes.type = "incomingNotification"
     }
     mes.id = clientId;
+    console.log("test", clients[clientId].clientColor);
+    mes.clientColor = clients[clientId].clientColor;
     broadcast(client, mes);
 
   });

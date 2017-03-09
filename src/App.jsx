@@ -11,7 +11,7 @@ class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      currentUser: {name: "Bob"}, // optional. if currentUser is not defined, it means the user is Anonymous
+      currentUser: {name: "Alex"}, // optional. if currentUser is not defined, it means the user is Anonymous
       messages: [],
       userCount: 0
     }
@@ -26,6 +26,7 @@ class App extends Component {
     console.log("adding mes to state");
     let addMsg = [...this.state.messages, mes];
     this.setState({messages: addMsg});
+    this.setState({currentUser: {name: mes.username} });
   }
 
   handleOnNotification = (notif) => {
@@ -39,23 +40,23 @@ class App extends Component {
       console.log('Connected to server');
     }
     wss.onmessage = (ev) => {
-      const data = JSON.parse(ev.data);
-      console.log("incoming mes from server", data);
-      switch(data.type) {
+      const mes = JSON.parse(ev.data);
+      console.log("incoming mes from server", mes);
+      switch(mes.type) {
        case "incomingMessage":
          // handle incoming message
-         this.handleOnMessage(data)
+         this.handleOnMessage(mes)
          break;
        case "incomingNotification":
          // handle incoming notification
-         this.handleOnMessage(data)
+         this.handleOnMessage(mes)
          break;
        case "userUpdate":
          // handle incoming userUpdate
-         this.setState({userCount: data.count})
+         this.setState({userCount: mes.count})
          break;
        default:
-        throw new Error("Unknown event type " + data.type);
+        throw new Error("Unknown event type " + mes.type);
       }
     };
   };
