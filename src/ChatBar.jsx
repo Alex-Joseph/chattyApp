@@ -21,11 +21,20 @@ class ChatBar extends Component {
   }
 
   handleSubmit(event) {
-    console.log("the state is", this.state);
     event.preventDefault();
+    let currentUser = this.props.currentUser;
+    let newUser = this.state.newUser;
+    let username = currentUser;
+    let notification = '';
+    if (newUser) {
+      username = newUser;
+      notification = `${currentUser} changed their name to ${newUser}`;
+    }
     this.props.onSubmitMessage({
-      username: this.state.newUser || this.props.currentUser,
-      content: this.state.message
+      type: "postMessage",
+      username: username,
+      content: this.state.message,
+      notification: notification
     })
     this.setState({message: ''})
   }
@@ -34,11 +43,17 @@ class ChatBar extends Component {
     return (
       <div>
         <footer className="chatbar">
-          <form className="chatbar" onSubmit={this.handleSubmit}>
-            <input className="chatbar-username" placeholder="Your Name (Optional)"
-              defaultValue={this.props.currentUser} onChange={this.handleUserChange.bind(this)} />
-            <input type="text" className="chatbar-message" placeholder="Type a message
-              and hit ENTER" value={this.state.message} onChange={this.handleChange} />
+          <form className="chatbar"
+            onSubmit={this.handleSubmit}>
+            <input className="chatbar-username"
+              placeholder="Your Name (Optional)"
+              defaultValue={this.props.currentUser}
+              onChange={this.handleUserChange.bind(this)} />
+            <input type="text"
+              className="chatbar-message"
+              placeholder="Type a message and hit ENTER"
+              value={this.state.message}
+              onChange={this.handleChange} />
             <input type="submit" value="Send" />
           </form>
         </footer>
