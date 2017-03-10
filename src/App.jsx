@@ -3,22 +3,28 @@ import MessageList from './MessageList.jsx';
 import Message from './Message.jsx';
 import ChatBar from './ChatBar.jsx';
 import Notification from './Notification.jsx';
+import ReactDOM from 'react-dom';
 
 const wss = new WebSocket('ws://localhost:3001');
 
 class App extends Component {
-
   constructor(props) {
     super(props);
     this.state = {
-      currentUser: {name: "Alex"}, // optional. if currentUser is not defined, it means the user is Anonymous
+      currentUser: {name: 'Alex'}, // optional. if currentUser is not defined, it means the user is Anonymous
       messages: [],
       userCount: 0
     }
   }
 
+  scrollToBottom = () => {
+      const node = ReactDOM.findDOMNode(this.messagesEnd);
+      node.scrollIntoView({behavior: "smooth"});
+  }
+
   handleSubmitMessage = (msg) => {
     console.log("submitting message to server");
+    this.setState({currentUser: {name: msg.currentUser} });
     wss.send(JSON.stringify(msg));
   }
 
@@ -26,12 +32,15 @@ class App extends Component {
     console.log("adding mes to state");
     let addMsg = [...this.state.messages, mes];
     this.setState({messages: addMsg});
-    this.setState({currentUser: {name: mes.username} });
   }
 
   handleOnNotification = (notif) => {
     console.log("processing notification", notif);
     wss.send(notif);
+  }
+
+  componentDidUpdate() {
+      this.scrollToBottom();
   }
 
   componentDidMount = () => {
@@ -58,7 +67,8 @@ class App extends Component {
        default:
         throw new Error("Unknown event type " + mes.type);
       }
-    };
+      this.scrollToBottom();
+    }
   };
 
   render() {
@@ -77,6 +87,9 @@ class App extends Component {
           onSubmitMessage={this.handleSubmitMessage}
           onSubmitNotif={this.handleOnNotification}
         />
+        <div style={ {float:"left", clear: "both"} }
+          ref={(el) => { this.messagesEnd = el; }}>
+        </div>
       </div>
     )
   }

@@ -30,7 +30,6 @@ function clientConnected(client, clientId, clientColor) {
 
 function broadcast(client, pkge) {
   for (cltId in clients) {
-    console.log("readyState", clients[cltId].client.readyState, "socket status", WebSocket.OPEN);
     if (cltId !== client && clients[cltId].client.readyState === WebSocket.OPEN) {
       clients[cltId].client.send(JSON.stringify(pkge));
     }

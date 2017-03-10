@@ -3,15 +3,13 @@ class ChatBar extends Component {
   constructor(props) {
     super(props);
     this.state = {newUser: '', message: ''};
-    this.handleChange = this.handleChange.bind(this);
-    this.handleSubmit = this.handleSubmit.bind(this);
   }
 
-  handleChange(event) {
+  handleChange = (event) => {
     this.setState({message: event.target.value});
   }
 
-  handleUserChange(event) {
+  handleUserChange = (event) => {
     if (event.target.value) {
       this.setState({newUser: event.target.value});
     }
@@ -20,19 +18,18 @@ class ChatBar extends Component {
     }
   }
 
-  handleSubmit(event) {
+  handleSubmit = (event) => {
     event.preventDefault();
     let currentUser = this.props.currentUser;
     let newUser = this.state.newUser;
-    let username = currentUser;
     let notification = '';
     if (newUser) {
-      username = newUser;
+      currentUser = newUser;
       notification = `${currentUser} changed their name to ${newUser}`;
     }
     this.props.onSubmitMessage({
       type: "postMessage",
-      username: username,
+      currentUser: currentUser,
       content: this.state.message,
       notification: notification
     })
@@ -48,7 +45,7 @@ class ChatBar extends Component {
             <input className="chatbar-username"
               placeholder="Your Name (Optional)"
               defaultValue={this.props.currentUser}
-              onChange={this.handleUserChange.bind(this)} />
+              onChange={this.handleUserChange} />
             <input type="text"
               className="chatbar-message"
               placeholder="Type a message and hit ENTER"
